@@ -180,3 +180,64 @@ This works because flock exclusively locks the file until the locker completes e
  54     return 0;
  55 }  
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+Another important consideration is how iovec works
+ 43    struct iovec
+ 44    {
+ 45      /// byte count to read/write
+ 46      u_long iov_len;
+ 47      /// data to be read/written
+ 48      char *iov_base;
+ 49 
+ 50      // WSABUF is a Winsock2-only type.
+ 51 #  if defined (ACE_HAS_WINSOCK2) && (ACE_HAS_WINSOCK2 != 0)
+ 52      operator WSABUF &(void) { return *((WSABUF *) this); }
+ 53 #  endif /* defined (ACE_HAS_WINSOCK2) && (ACE_HAS_WINSOCK2 != 0) */
+ 54    };
+ 55 #endif /* ACE_LACKS_IOVEC */
+
+
+
+(!) Receives are really strange.  Basically the retval determines the length.  However, the iov[n].iov_len is meaningless.  I found that the
+first index buffer sized by ret is the received value.
+
+
+RtpsUdpReceiveStrategy.cpp
+ 38 size_t
+ 39 RtpsUdpReceiveStrategy::receive_bytes(iovec iov[],
+ 40                                       int n,
+ 41                                       ACE_INET_Addr& remote_address,
+ 42                                       ACE_HANDLE fd)
+ 43 {
+ 44   const ACE_SOCK_Dgram& socket =
+ 45     (fd == link_->unicast_socket().get_handle())
+ 46     ? link_->unicast_socket() : link_->multicast_socket();
+ 47 #ifdef ACE_LACKS_SENDMSG
+ 48   char buffer[0x10000];
+ 49   ssize_t scatter = socket.recv(buffer, sizeof buffer, remote_address);
+ 50   char* iter = buffer;
+ 51   for (int i = 0; scatter > 0 && i < n; ++i) {
+ 52     const size_t chunk = std::min(static_cast<size_t>(iov[i].iov_len), // int on LynxOS
+ 53                                   static_cast<size_t>(scatter));
+ 54     std::memcpy(iov[i].iov_base, iter, chunk);
+ 55     scatter -= chunk;
+ 56     iter += chunk;
+ 57   }
+ 58   const ssize_t ret = (scatter < 0) ? scatter : (iter - buffer);
+ 59 #else
+ 60   const ssize_t ret = socket.recv(iov, n, remote_address);
+ 61 
+ 62   printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Receive\n");
+ 63   printf("%d\n", iov[0].iov_len);
+ 64   for(int i = 0; i < ret; i++) {
+ 65     //for(int j = 0; j < iov[i].iov_len; j++) {
+ 66     char *data = (char *)(iov[0].iov_base);
+ 67     printf("0x%x ", 0xff & data[i]);
+ 68   }
+ 69   printf("\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Receive\n\n");
+ 70 #endif
+ 71   remote_address_ = remote_address;
+ 72   return ret;
+ 73 }
+
