@@ -23,7 +23,7 @@ namespace OpenDDS {
 namespace DCPS {
 
 RtpsUdpTestInst::RtpsUdpTestInst(const OPENDDS_STRING& name)
-  : TransportInst("rtps_udp", name)
+  : TransportInst("rtps_udp_test", name)
 #if defined (ACE_DEFAULT_MAX_SOCKET_BUFSIZ)
   , send_buffer_size_(ACE_DEFAULT_MAX_SOCKET_BUFSIZ)
   , rcv_buffer_size_(ACE_DEFAULT_MAX_SOCKET_BUFSIZ)
@@ -181,7 +181,7 @@ RtpsUdpTestInst::populate_locator(OpenDDS::DCPS::TransportLocator& info) const
                            this->local_address());
   }
 
-  info.transport_type = "rtps_udp";
+  info.transport_type = "rtps_udp_test";
   RTPS::locators_to_blob(locators, info.data);
 
   return locators.length();
@@ -191,7 +191,7 @@ const TransportBLOB*
 RtpsUdpTestInst::get_blob(const OpenDDS::DCPS::TransportLocatorSeq& trans_info) const
 {
   for (CORBA::ULong idx = 0, limit = trans_info.length(); idx != limit; ++idx) {
-    if (std::strcmp(trans_info[idx].transport_type, "rtps_udp") == 0) {
+    if (std::strcmp(trans_info[idx].transport_type, "rtps_udp_test") == 0) {
       return &trans_info[idx].data;
     }
   }

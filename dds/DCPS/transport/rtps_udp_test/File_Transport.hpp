@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/file.h>
+#include <string>
 
 #include "ace/INET_Addr.h"
 
@@ -10,6 +11,19 @@
 
 class File_Transport {
     public:
+        #pragma pack(1)
+        struct header {
+            char H;
+            char D;
+            short size;
+        };
+
+        #pragma pack(1)
+        struct footer {
+            char E;
+            char D;
+        };
+
         static File_Transport &instance();
         int send(const iovec iov[], int n, const ACE_INET_Addr& addr);
         int receive(const iovec iov[], int n, const ACE_INET_Addr& addr);
@@ -17,6 +31,9 @@ class File_Transport {
         ~File_Transport();
     private:
         File_Transport();
+        short get_iov_size(const iovec iov[], int n);
+        unsigned get_opened_file_size(FILE *fd);
+        FILE *open(const ACE_INET_Addr &addr, char *ot);
 
         unsigned file_index;
 

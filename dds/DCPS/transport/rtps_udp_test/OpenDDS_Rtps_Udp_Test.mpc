@@ -6,6 +6,6 @@ project: dcpslib, dcps_rtps, install {
   dynamicflags  = OPENDDS_RTPS_UDP_TEST_BUILD_DLL
 
   specific {
-    install_dir = dds/DCPS/transport/rtps_udp
+    install_dir = dds/DCPS/transport/rtps_udp_test
   }
 }

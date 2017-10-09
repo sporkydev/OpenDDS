@@ -309,7 +309,7 @@ RtpsUdpTestTransport::shutdown_i()
 void
 RtpsUdpTestTransport::release_datalink(DataLink* /*link*/)
 {
-  // No-op for rtps_udp: keep the link_ around until the transport is shut down.
+  // No-op for rtps_udp_test: keep the link_ around until the transport is shut down.
 }
 
 void

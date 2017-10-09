@@ -75,7 +75,7 @@ private:
   virtual void release_datalink(DataLink* link);
   void pre_detach(const TransportClient_rch& client);
 
-  virtual OPENDDS_STRING transport_type() const { return "rtps_udp"; }
+  virtual OPENDDS_STRING transport_type() const { return "rtps_udp_test"; }
 
   RtpsUdpTestDataLink_rch make_datalink(const GuidPrefix_t& local_prefix);
 

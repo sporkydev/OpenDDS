@@ -12,7 +12,7 @@
 #include "dds/DCPS/transport/framework/TransportType.h"
 
 namespace {
-  const char RTPS_UDP_TEST_NAME[] = "rtps_udp";
+  const char RTPS_UDP_TEST_NAME[] = "rtps_udp_test";
 }
 
 OPENDDS_BEGIN_VERSIONED_NAMESPACE_DECL

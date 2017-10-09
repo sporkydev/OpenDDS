@@ -21,7 +21,7 @@ public:
   RtpsUdpTestInitializer();
 };
 
-static RtpsUdpTestInitializer rtps_udp_init;
+static RtpsUdpTestInitializer rtps_udp_test_init;
 
 } // namespace DCPS
 } // namespace OpenDDS
