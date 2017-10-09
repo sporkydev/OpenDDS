@@ -55,7 +55,7 @@ int File_Transport::receive(const iovec iov[], int n, const ACE_INET_Addr& addr)
     int lock_status = 0;
     int size = 0;
 
-    fd = fopen("somethingstring", "r");
+    fd = open(addr, "r");
     if(fd == NULL) {
         return ERROR_SIZE;
     }
@@ -104,7 +104,7 @@ unsigned File_Transport::get_opened_file_size(FILE *fp) {
     return size;
 }
 
-FILE *open(const ACE_INET_Addr &addr, char *ot) {
+FILE *File_Transport::open(const ACE_INET_Addr &addr, char *ot) {
     FILE *fp;
     char addr_str[80];                    
     addr.addr_to_string(addr_str, 80);                           
