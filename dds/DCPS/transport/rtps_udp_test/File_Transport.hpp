@@ -4,10 +4,19 @@
 #include <unistd.h>
 #include <sys/file.h>
 #include <string>
+#include <map>
 
 #include "ace/INET_Addr.h"
 
 #define ERROR_SIZE -1
+
+/* Assumptions
+    1) All Addresses are Localhost
+    2) The Endpoints or Ports are provided upon instantiation of the singleton
+*/
+
+typedef std::map<unsigned, std::string> File_Name_Map;
+typedef std::map<unsigned, std::string>::iterator File_Name_Map_Itr;
 
 class File_Transport {
     public:
@@ -32,11 +41,14 @@ class File_Transport {
     private:
         File_Transport();
         short get_iov_size(const iovec iov[], int n);
-        unsigned get_opened_file_size(FILE *fd);
-        FILE *open(const ACE_INET_Addr &addr, char *ot);
+        unsigned get_open_file_size(FILE *fd);
+        FILE *open(const char *filename, char *ot);
+        bool port_exist(unsigned port_num);
+        
 
-        unsigned file_index;
-
+        std::map<unsigned, unsigned> file_index_map;
+        File_Name_Map file_name_map;
+    
         // We need to either remove the data or keep track of it in the file
         // Each IP Address will have its own file
         // Writers will append to the file
