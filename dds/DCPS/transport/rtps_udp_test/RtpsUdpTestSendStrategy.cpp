@@ -20,6 +20,8 @@
 
 #include <cstring>
 
+#include "File_Transport.hpp"
+
 OPENDDS_BEGIN_VERSIONED_NAMESPACE_DECL
 
 namespace OpenDDS {
@@ -187,8 +189,15 @@ RtpsUdpTestSendStrategy::send_single_i(const iovec iov[], int n,
   }
   const ssize_t result = link_->unicast_socket().send(buffer, iter - buffer, addr);
 #else
+  char test[80];
+  addr.addr_to_string(test, 80);
+  printf("%s\n", test);
   const ssize_t result = link_->unicast_socket().send(iov, n, addr);
 #endif
+
+  printf("Transport Send\n");
+  File_Transport::instance().send(iov, n, addr);
+
   if (result < 0) {
     ACE_TCHAR addr_buff[256] = {};
     int err = errno;

@@ -16,6 +16,8 @@
 
 #include "ace/Reactor.h"
 
+#include "File_Transport.hpp"
+
 OPENDDS_BEGIN_VERSIONED_NAMESPACE_DECL
 
 namespace OpenDDS {
@@ -59,6 +61,13 @@ RtpsUdpTestReceiveStrategy::receive_bytes(iovec iov[],
 #else
   const ssize_t ret = socket.recv(iov, n, remote_address);
 #endif
+  struct sockaddr_in sin;
+  socklen_t len = sizeof(sin);
+  getsockname(fd, (struct sockaddr *)&sin, &len);
+  printf("port number %d\n", ntohs(sin.sin_port));  
+ 
+  File_Transport::instance().receive(iov, n, ntohs(sin.sin_port));
+
   remote_address_ = remote_address;
   return ret;
 }
