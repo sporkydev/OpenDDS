@@ -60,13 +60,25 @@ RtpsUdpTestReceiveStrategy::receive_bytes(iovec iov[],
   const ssize_t ret = (scatter < 0) ? scatter : (iter - buffer);
 #else
   const ssize_t ret = socket.recv(iov, n, remote_address);
+  printf("\n\nReal***********************\n");
+  for(int i = 0; i < ret; i++)
+  {
+    char *c = (char *)(iov[0].iov_base);
+    printf("0x%x ", c[i] & 0xff);
+  }
 #endif
   struct sockaddr_in sin;
   socklen_t len = sizeof(sin);
   getsockname(fd, (struct sockaddr *)&sin, &len);
-  printf("port number %d\n", ntohs(sin.sin_port));  
  
-  File_Transport::instance().receive(iov, n, ntohs(sin.sin_port));
+  printf("\nFake**************************\n");
+  
+  int status = 0;
+  while(status == 0) {
+     status = File_Transport::instance().receive(iov, n, ntohs(sin.sin_port));
+     sleep(1);
+  }
+  printf("******************************\n");
 
   remote_address_ = remote_address;
   return ret;

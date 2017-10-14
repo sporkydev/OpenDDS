@@ -34,6 +34,7 @@ class File_Transport {
         int send(const iovec iov[], int n, const ACE_INET_Addr& addr);
         int receive(const iovec iov[], int n, int port);
 
+        void save_receive(const iovec iov[], int n, int port);
         ~File_Transport();
     private:
         File_Transport();

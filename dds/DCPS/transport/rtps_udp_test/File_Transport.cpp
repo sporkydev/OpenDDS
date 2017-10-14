@@ -20,6 +20,7 @@ int File_Transport::send(const iovec iov[], int n, const ACE_INET_Addr& addr) {
 
     fd = open(addr, "a");
     if(fd == NULL) {
+        printf("Error: Cannot open file to write.\n");
         return ERROR_SIZE;
     }
 
@@ -55,13 +56,13 @@ int File_Transport::receive(const iovec iov[], int n, int port_num) {
 
     fd = open(port_num, "r");
     if(fd == NULL) {
+        printf("ERROR: Cannot Open File to Read.\n");
         return ERROR_SIZE;
     }
 
     unsigned file_index = file_index_map_[port_num];
     unsigned last_index = get_open_file_size(fd);
     
-    printf("receive port number : %u\n", port_num);
     printf("file index : %u, last index : %u\n", file_index, last_index);
 
     if(file_index != last_index) {
@@ -77,7 +78,6 @@ int File_Transport::receive(const iovec iov[], int n, int port_num) {
 
         // TODO: There seems to be one extra byte left over after this read.  I am not sure this is correct.
         fgets(hdr_char, sizeof(header), fd);
-        printf("Header Size: %d\n", sizeof(header));
         hdr_ptr = reinterpret_cast<header *>(hdr_char);
         printf("%c%c : %u\n", hdr_ptr->H, hdr_ptr->D, hdr_ptr->size);
         size = hdr_ptr->size; 
@@ -88,10 +88,10 @@ int File_Transport::receive(const iovec iov[], int n, int port_num) {
         // Temporary Memory Allocation to make we are getting the data
         for(int i=0; i < size; i++) {
             char val = fgetc(fd);
-            printf("0x%x ", val);
+            printf("0x%x ", val & 0xff);
         }
-        printf("\n\n");
         
+        printf("\n");
         file_index_map_[port_num] += sizeof(header) + size + sizeof(footer);
     }
     
@@ -101,7 +101,13 @@ int File_Transport::receive(const iovec iov[], int n, int port_num) {
 
     fclose(fd);
 
-    return 0;
+    printf("Final File Index %u\n", file_index_map_[port_num]); 
+
+    return size;
+}
+
+void File_Transport::save_receive(const iovec iov[], int n, int port) {
+    
 }
 
 File_Transport::~File_Transport() {
